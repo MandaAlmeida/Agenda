@@ -1,0 +1,11 @@
+.container {
+    position: relative;
+    width: 1200px;
+    min-height: 850px;
+    margin: 0 auto;
+    padding: 5px;
+    color: $white;
+    display: flex;
+    border-radius: 10px;
+    background-color: $gray5;
+}
