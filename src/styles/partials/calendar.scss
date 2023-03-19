@@ -211,6 +211,8 @@
         padding: 20px 0;
 
         .calendar {
+            height: 100%;
+
             &::after {
                 top: 100%;
                 left: 50%;
