@@ -5,3 +5,10 @@ body {
     justify-content: center;
     background-color: $gray1;
 }
+
+@media screen and (max-width: 1000px) {
+    body {
+        align-items: flex-start;
+        justify-content: flex-start;
+    }
+}

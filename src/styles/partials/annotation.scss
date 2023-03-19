@@ -1,7 +1,7 @@
 .right {
     position: relative;
     width: 40%;
-    min-height: 100%;
+    height: 100%;
     padding: 20px 0;
 
     .today-date {
@@ -262,6 +262,39 @@
 
         i {
             pointer-events: none;
+        }
+    }
+
+}
+
+
+@media (max-width: 1024px) {
+    .right {
+        width: 100%;
+        padding: 20px 0;
+
+        .events {
+            padding-bottom: 340px;
+        }
+
+        .add-event-wrapper {
+            bottom: 100px;
+        }
+
+    }
+}
+
+@media (max-width: 500px) {
+    .right {
+        .today-date {
+            padding: 16px;
+            height: auto;
+            margin: 0;
+        }
+
+        .add-event,
+        .add-event-wrapper {
+            position: fixed;
         }
     }
 }
