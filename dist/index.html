@@ -49,48 +49,82 @@
         </div>
       </div>
       <div class="right">
-        <div class="today-date">
-          <div class="event-day"></div>
-          <div class="event-date"></div>
+        <div class="nav-bnt">
+          <button class="reminder-bnt">Lembretes</button>
+          <button class="annotation-bnt">Anotações</button>
         </div>
-        <div class="events"></div>
-        <div class="add-event-wrapper">
-          <div class="add-event-header">
-            <div class="title">Adicionar evento</div>
-            <i class="fas fa-times close"></i>
+        <div class="annotation-container">
+          <div class="left">
+            <h3 class="title">Anotações</h3>
+            <ul class="annotations"></ul>
           </div>
-          <div class="add-event-body">
-            <div class="add-event-input">
-              <input
-                type="text"
-                placeholder="Nome do evento"
-                class="event-name"
-              />
+          <div class="create-annotations">
+            <div class="create-annotations-header">
+              <h3 class="title">Criar anotação</h3>
+              <i class="fas fa-times close-annotation"></i>
             </div>
-            <div class="add-event-input">
-              <input
-                type="text"
-                placeholder="Hora inicial"
-                class="event-time-from"
-              />
+            <div class="form-wrapper">
+              <label class="text">
+                <input type="text" placeholder="Título" class="form-title" />
+                <textarea
+                  cols="30"
+                  rows="5"
+                  placeholder="Descrição"
+                  class="form-description"
+                  required
+                ></textarea>
+              </label>
             </div>
-            <div class="add-event-input">
-              <input
-                type="text"
-                placeholder="Hora final"
-                class="event-time-to"
-              />
-            </div>
+            <button class="create-annotations-bnt">Adicionar</button>
           </div>
-          <div class="add-event-footer">
-            <button class="add-event-button" aria-label="Remover evento">
-              Adicionar evento
-            </button>
-          </div>
+          <button class="add-annotation-bnt" aria-label="Adicionar anotações">
+            <i class="fas fa-plus"></i>
+          </button>
         </div>
-        <button class="add-event" aria-label="Adicionar evento">
-          <i class="fas fa-plus"></i>
-        </button>
+        <div class="reminder-container active">
+          <div class="today-date">
+            <div class="event-day"></div>
+            <div class="event-date"></div>
+          </div>
+          <div class="events"></div>
+          <div class="add-event-wrapper">
+            <div class="add-event-header">
+              <div class="title">Adicionar evento</div>
+              <i class="fas fa-times close"></i>
+            </div>
+            <div class="add-event-body">
+              <div class="add-event-input">
+                <input
+                  type="text"
+                  placeholder="Nome do evento"
+                  class="event-name"
+                />
+              </div>
+              <div class="add-event-input">
+                <input
+                  type="text"
+                  placeholder="Hora inicial"
+                  class="event-time-from"
+                />
+              </div>
+              <div class="add-event-input">
+                <input
+                  type="text"
+                  placeholder="Hora final"
+                  class="event-time-to"
+                />
+              </div>
+            </div>
+            <div class="add-event-footer">
+              <button class="add-event-button" aria-label="Remover evento">
+                Adicionar evento
+              </button>
+            </div>
+          </div>
+          <button class="add-event" aria-label="Adicionar evento">
+            <i class="fas fa-plus"></i>
+          </button>
+        </div>
       </div>
     </div>
   </body>

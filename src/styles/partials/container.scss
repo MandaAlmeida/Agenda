@@ -1,14 +1,60 @@
 .container {
     position: relative;
     width: 1200px;
-    min-height: 850px;
+    height: 90vh;
     margin: 0 auto;
     padding: 5px;
     color: $white;
     display: flex;
-
     border-radius: 10px;
     background-color: $gray7;
+
+}
+
+.annotation-container {
+    display: none;
+
+    &.active {
+        display: flex;
+    }
+}
+
+
+.reminder-container {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+
+    &.active {
+        display: flex;
+
+    }
+}
+
+.nav-bnt {
+    position: absolute;
+    width: 100%;
+    display: flex;
+    padding: 0 20px;
+    justify-content: space-between;
+    z-index: 10;
+
+    .reminder-bnt,
+    .annotation-bnt {
+        background-color: transparent;
+        padding: 5px;
+        border: 1px solid $primary;
+        color: $primary;
+        outline: none;
+        border-radius: 5px;
+        font-size: 0.8rem;
+        cursor: pointer;
+
+        &:hover {
+            background-color: $primary;
+            color: $white;
+        }
+    }
 }
 
 @media (max-width: 1024px) {
@@ -18,5 +64,13 @@
         height: initial;
         max-height: 100%;
         padding: 16px;
+    }
+
+    .reminder-container {
+        margin-top: 10px;
+    }
+
+    .nav-bnt {
+        top: 7px;
     }
 }

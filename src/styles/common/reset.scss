@@ -4,3 +4,17 @@
     padding: 0;
     font-family: $font-family;
 }
+
+::-webkit-scrollbar {
+    width: 5px;
+}
+
+::-webkit-scrollbar-track {
+    background: $gray;
+    border-radius: 50px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: $primary;
+    border-radius: 50px;
+}
