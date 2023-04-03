@@ -24,11 +24,12 @@
             overflow-y: auto;
             align-items: center;
             justify-content: center;
+            padding: 10px;
 
             .annotation {
                 border-radius: 5px;
                 padding: 16px;
-                width: 150px;
+                width: 30%;
                 height: 180px;
                 cursor: pointer;
                 list-style: none;

@@ -3,22 +3,24 @@ export class Annotation {
         this.annotationArr = [];
         this.selectors();
         this.events();
+        this.getEvents();
     }
 
     selectors() {
-        this.inputTitle = document.querySelector(".form-title"),
-            this.inputDescription = document.querySelector(".form-description"),
-            this.createAnnotationBnt = document.querySelector(".create-annotations-bnt"),
-            this.reminderBnt = document.querySelector(".reminder-bnt"),
-            this.annotationBnt = document.querySelector(".annotation-bnt"),
-            this.items = document.querySelector(".annotations"),
-            this.addAnnotationBtn = document.querySelector(".add-annotation-bnt"),
-            this.addAnnotationContainer = document.querySelector(".create-annotations"),
-            this.addAnnotationCloseBtn = document.querySelector(".close-annotation")
+        this.inputTitle = document.querySelector(".form-title");
+        this.inputDescription = document.querySelector(".form-description");
+        this.createAnnotationBnt = document.querySelector(".create-annotations-bnt");
+        this.reminderBnt = document.querySelector(".reminder-bnt");
+        this.annotationBnt = document.querySelector(".annotation-bnt");
+        this.items = document.querySelector(".annotations");
+        this.addAnnotationBtn = document.querySelector(".add-annotation-bnt");
+        this.addAnnotationContainer = document.querySelector(".create-annotations");
+        this.addAnnotationCloseBtn = document.querySelector(".close-annotation");
+        this.annotationBntEvent = document.querySelector(".annotation-bnt");
     }
 
     events() {
-
+        this.annotationBntEvent.addEventListener("click", this.renderListItems.bind(this))
         this.addAnnotationBtn.addEventListener("click", () => {
             this.addAnnotationContainer.classList.toggle("active");
         });
@@ -57,15 +59,28 @@ export class Annotation {
     renderListItems() {
         let annotations = "";
 
-        this.annotationArr.forEach((item) => {
+        this.annotationArr.forEach((annotation) => {
             annotations += `
             <li class="annotation">
-                <h3  class="annotation-title">${item.title}</h3>
-                <p class="annotation-description">${item.description}</p>
+                <h3  class="annotation-title">${annotation.title}</h3>
+                <p class="annotation-description">${annotation.description}</p>
             </li>
         `;
         }),
             this.items.innerHTML = annotations;
 
+        this.saveEvents()
+
     };
+
+    saveEvents() {
+        localStorage.setItem("annotation", JSON.stringify(this.annotationArr));
+    };
+
+    getEvents() {
+        if (localStorage.getItem("annotation" === null)) {
+            return;
+        }
+        this.annotationArr.push(...JSON.parse(localStorage.getItem("annotation")))
+    }
 }

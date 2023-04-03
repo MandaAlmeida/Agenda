@@ -1,9 +1,11 @@
 export class Calendar {
     constructor() {
+        this.eventsArr = []
         this.today = new Date();
         this.activeDay;
         this.month = this.today.getMonth();
         this.year = this.today.getFullYear();
+        this.users = JSON.parse(localStorage.getItem('user'));
         this.months = [
             "Janeiro",
             "Fevereiro",
@@ -18,39 +20,50 @@ export class Calendar {
             "Novembro",
             "Dezembro"
         ];
-        this.eventsArr = [];
+        if (localStorage.getItem('token')) {
+            this.init();
 
+        } else {
+            window.location.href = 'http://localhost:3000/index.html';
+        }
+    }
+
+    async init() {
         this.selectors();
+        await this.createEvents();
         this.events();
         this.initCalendar();
-        this.getEvents();
+        this.user();
     }
 
     selectors() {
-        this.calendar = document.querySelector(".calendar"),
-            this.date = document.querySelector(".date"),
-            this.daysContainer = document.querySelector(".days"),
-            this.prev = document.querySelector(".prev"),
-            this.next = document.querySelector(".next"),
-            this.todayBtn = document.querySelector(".today-btn"),
-            this.goBtn = document.querySelector(".go-btn"),
-            this.eventDay = document.querySelector(".event-day"),
-            this.eventDate = document.querySelector(".event-date"),
-            this.dateInput = document.querySelector(".date-input"),
-            this.addEventSubmit = document.querySelector(".add-event-button"),
-            this.addEventBtn = document.querySelector(".add-event"),
-            this.addEventContainer = document.querySelector(".add-event-wrapper"),
-            this.addEventCloseBtn = document.querySelector(".close"),
-            this.addEventTitle = document.querySelector(".event-name"),
-            this.addEventFrom = document.querySelector(".event-time-from"),
-            this.addEventTo = document.querySelector(".event-time-to"),
-            this.eventsContainer = document.querySelector(".events"),
-            this.day = document.querySelectorAll(".day"),
-            this.error = document.querySelector(".alert"),
-            this.addAnnotation = document.querySelector(".annotation-container"),
-            this.addReminder = document.querySelector(".reminder-container"),
-            this.reminderBntEvent = document.querySelector(".reminder-bnt"),
-            this.annotationBntEvent = document.querySelector(".annotation-bnt");
+        this.userBnt = document.querySelector(".button-user")
+        this.containerUser = document.querySelector(".container-icon-user")
+        this.calendar = document.querySelector(".calendar");
+        this.date = document.querySelector(".date");
+        this.daysContainer = document.querySelector(".days");
+        this.prev = document.querySelector(".prev");
+        this.next = document.querySelector(".next");
+        this.todayBtn = document.querySelector(".today-btn");
+        this.goBtn = document.querySelector(".go-btn");
+        this.eventDay = document.querySelector(".event-day");
+        this.eventDate = document.querySelector(".event-date");
+        this.dateInput = document.querySelector(".date-input");
+        this.addEventSubmit = document.querySelector(".add-event-button");
+        this.addEventBtn = document.querySelector(".add-event");
+        this.addEventContainer = document.querySelector(".add-event-wrapper");
+        this.addEventCloseBtn = document.querySelector(".close");
+        this.addEventTitle = document.querySelector(".event-name");
+        this.addEventFrom = document.querySelector(".event-time-from");
+        this.addEventTo = document.querySelector(".event-time-to");
+        this.eventsContainer = document.querySelector(".events");
+        this.day = document.querySelectorAll(".day");
+        this.error = document.querySelector(".alert");
+        this.addAnnotation = document.querySelector(".annotation-container");
+        this.addReminder = document.querySelector(".reminder-container");
+        this.reminderBntEvent = document.querySelector(".reminder-bnt");
+        this.annotationBntEvent = document.querySelector(".annotation-bnt");
+
     }
 
     events() {
@@ -70,7 +83,6 @@ export class Calendar {
             this.addEventContainer.classList.toggle("active");
         });
         this.addEventCloseBtn.addEventListener("click", () => {
-            console.log(this.addEventCloseBtn);
             this.addEventContainer.classList.remove("active");
         });
         document.addEventListener("click", (e) => {
@@ -78,6 +90,27 @@ export class Calendar {
                 this.addEventContainer.classList.remove("active");
             }
         });
+        this.userBnt.addEventListener("click", () => {
+            this.containerUser.classList.toggle("active");
+        })
+    }
+
+    user() {
+        const user = this.users;
+        this.containerUser.innerHTML = `
+        <section class="dates-users_text"> <p class="dates-users_name">Nome: ${user[0].name}</p>
+        <span class="dates-users_email">${user[0].email}</span></section>
+        <a href="/index.html">
+        <button class="dates-users_button">Sair da conta</button>
+        </a>
+        `
+        if (document.querySelector(".dates-users_button")) {
+            const bnt = document.querySelector(".dates-users_button");
+
+            bnt.addEventListener("click", () => {
+                localStorage.removeItem("token");
+            });
+        }
     }
 
     initCalendar() {
@@ -88,9 +121,7 @@ export class Calendar {
         const lastDate = lastDay.getDate();
         const day = firstDay.getDay();
         const nextDays = 7 - lastDay.getDay() - 1;
-
         this.date.innerHTML = `${this.months[this.month]} ${this.year}`;
-
         let days = "";
 
         for (let i = day; i > 0; i--) {
@@ -100,8 +131,12 @@ export class Calendar {
         for (let x = 1; x <= lastDate; x++) {
             let event = false;
             this.eventsArr.forEach((eventObj) => {
+                const date = eventObj.date;
+                const dia = date.substr(0, 2);
+                const mes = date.substr(2, 2);
+                const ano = date.substr(4, 4);
                 if (
-                    eventObj.day == x && eventObj.month == this.month + 1 && eventObj.year == this.year
+                    dia == x && mes == this.month + 1 && ano == this.year
                 ) {
                     // if event found
                     event = true
@@ -113,7 +148,6 @@ export class Calendar {
                 this.activeDay = x;
                 this.getActiveDay(x);
                 this.updateEvents(x);
-
                 //if event found also add event class
                 //add active on today at startup
                 if (event) {
@@ -138,6 +172,7 @@ export class Calendar {
         this.daysContainer.innerHTML = days;
 
         this.addListener();
+        this.updateEvents(this.activeDay);
     }
 
     prevMonth() {
@@ -243,7 +278,7 @@ export class Calendar {
 
                     setTimeout(() => {
                         // select all days of that month
-                        const days = document.querySelector(".day");
+                        const days = document.querySelectorAll(".day");
                         //after going to prev month add active to clicked
                         days.forEach((day) => {
                             if (!day.classList.contains("prev-date") && day.innerHTML == e.target.innerHTML) {
@@ -256,8 +291,8 @@ export class Calendar {
 
                     setTimeout(() => {
                         // select all days of that month
-                        const days = document.querySelector(".day");
-                        //after going to next month adda ctive to clicked
+                        const days = document.querySelectorAll(".day");
+                        //after going to next month add active to clicked
                         days.forEach((day) => {
                             if (!day.classList.contains("next-date") && day.innerHTML == e.target.innerHTML) {
                                 day.classList.add("active");
@@ -281,45 +316,59 @@ export class Calendar {
 
         this.eventDay.innerHTML = dayName;
         this.eventDate.innerHTML = `${date} de ${this.months[this.month]} de ${this.year}`;
+        this.updateEvents(date);
     }
-    //function to show events of that day
 
+    async createEvents() {
+        const id = this.users[0].id
+        const response = await fetch(`https://server-agenda.vercel.app/user/${id}/reminder`);
+        const data = await response.json();
+        this.eventsArr = data;
+    }
+
+    //function to show events of that day
     updateEvents(date) {
-        let events = "";
+
+        let events = ""
         this.eventsArr.forEach((event) => {
+            const dateEvent = event.date;
+            const dia = dateEvent.substr(0, 2);
+            const mes = dateEvent.substr(2, 2);
+            const ano = dateEvent.substr(4, 4);
+            const dateUpdate = date.toString().padStart(2, '0');
+
             //get events of active day only
-            if (date == event.day && this.month + 1 == event.month && this.year == event.year) {
-                // then show event on document
-                event.events.forEach((event) => {
-                    events += `
-                    <div class="event">
-                    <div class="title">
-                    <i class="fas fa-circle"></i>
-                    <h3 class="event-title">${event.title}</h3></div>
-                    <div class="event-time">
-                    <span>${event.time}</span>
-                    </div>
-                    </div>`
-                })
+            if (dateUpdate == dia && this.month + 1 == mes && this.year == ano) {
+                // then show event on document 
+                events += `
+                <div class="event">
+                <div class="title">
+                <i class="fas fa-circle"></i>
+                <h3 class="event-title">${event.title}</h3></div>
+                <div class="event-time">
+                <span>${event.hourStart} - ${event.hourEnd}</span>
+                </div>
+                </div>`;
+
             }
         });
-
         if (events === "") {
-            events = ` <div class="no-event">
-            <h3>Nenhum Evento</h3></div>`
+            events = `<div class="no-event">
+                <h3>Nenhum Evento</h3>
+            </div>`;
         }
 
+
         this.eventsContainer.innerHTML = events;
-        //save events when new one added
-        this.saveEvents();
-        return;
     }
+
     //lets create function to add events
     addEventSubmitF() {
         const activeDayElem = document.querySelector(".day.active");
         const eventTitle = this.addEventTitle.value;
         const eventTimeFrom = this.addEventFrom.value;
         const eventTimeTo = this.addEventTo.value;
+        const user = JSON.parse(localStorage.getItem('user'));
 
         //some validations
 
@@ -333,38 +382,35 @@ export class Calendar {
 
         if (timeFromArr.length !== 2 || timeToArr.length !== 2 || timeFromArr[0] > 23 || timeFromArr[1] > 59 || timeToArr[0] > 23 || timeToArr[1] > 59) {
             alert("Hora Inválida");
+            return;
         }
 
-        const timeFrom = this.convertTime(eventTimeFrom);
-        const timeTo = this.convertTime(eventTimeTo);
+
+        const date = this.activeDay.toString().padStart(2, '0').concat((this.month + 1).toString().padStart(2, '0'), this.year.toString());
 
         const newEvent = {
             title: eventTitle,
-            time: `${timeFrom} - ${timeTo}`
+            hourStart: eventTimeFrom,
+            hourEnd: eventTimeTo,
+            date: date,
         }
 
-        let eventAdded = false;
+        const id = user[0].id
 
-        //check if eventsArr not empty
-        if (this.eventsArr.length > 0) {
-            this.eventsArr.forEach((item) => {
-                if (item.day === this.activeDay && item.month === this.month + 1 && item.year === this.year) {
-                    item.events.push(newEvent);
-                    eventAdded = true;
-                }
+        fetch(`https://server-agenda.vercel.app/user/${id}/reminder`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(newEvent),
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log('data:', data)
             })
-        }
-
-        //if event array empty or current day has event create new
-        if (!eventAdded) {
-            this.eventsArr.push({
-                day: this.activeDay,
-                month: this.month + 1,
-                year: this.year,
-                events: [newEvent]
-            })
-        }
-
+            .catch(error => {
+                console.error('Erro ao criar data', error);
+            });
         //rename active from add event form
         this.addEventContainer.classList.remove("active")
 
@@ -373,25 +419,13 @@ export class Calendar {
         this.addEventFrom.value = "";
         this.addEventTo.value = "";
 
-        //Show current added event
-        this.updateEvents(this.activeDay);
-
         //also add event class to newly added day if not already
         if (!activeDayElem.classList.contains("event")) {
             activeDayElem.classList.add("event")
-
         }
+        this.createEvents();
+        this.updateEvents(this.activeDay);
     };
-
-    convertTime(timer) {
-        let timeArr = timer.split(":");
-        let timeHour = timeArr[0];
-        let timeMin = timeArr[1];
-        let time = `${timeHour}:${timeMin}`
-
-        return timer;
-    }
-
     //lets create a function to remove events on click
 
     eventsContainerF(e) {
@@ -399,23 +433,47 @@ export class Calendar {
         if (e.target.classList.contains("event")) {
             const eventTitle = e.target.children[0].children[1].innerHTML;
 
-            this.eventsArr.forEach((event) => {
-                if (event.day === this.activeDay && event.month === this.month + 1 && event.year === this.year) {
-                    event.events.forEach((item, index) => {
-                        if (item.title === eventTitle) {
-                            event.events.splice(index, 1);
+            this.eventsArr.forEach(async (event) => {
+                const id = event.id;
+                const dateEvent = event.date;
+                const dia = dateEvent.substr(0, 2);
+                const mes = dateEvent.substr(2, 2);
+                const ano = dateEvent.substr(4, 4);
+
+                try {
+                    const response = await fetch(`https://server-agenda.vercel.app/reminder/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
                         }
                     });
+                    const data = await response.json();
+                    if (dia === this.activeDay && mes === this.month + 1 && ano === this.year) {
+                        console.log("foi")
+                        let eventRemoved = false;
+                        event.events.forEach((item, index) => {
+                            if (item.title === eventTitle) {
+                                event.events.splice(index, 1);
+                                eventRemoved = true;
+                            }
+                        });
 
-                    //if no event remaining on that dat remove complete day
-                    if (event.events.length === 0) {
-                        this.eventsArr.splice(this.eventsArr.indexOf(event), 1);
+                        //if no event remaining on that dat remove complete day
+                        if (event.events.length === 0) {
+                            this.eventsArr.splice(this.eventsArr.indexOf(event), 1);
 
-                        //after remove complete day also remove active class of that day
-                        if (activeDayElem.classList.contains("event")) {
-                            activeDayElem.classList.remove("event")
+                            //after remove complete day also remove active class of that day
+                            if (activeDayElem.classList.contains("event")) {
+                                activeDayElem.classList.remove("event")
+                            }
+                        }
+
+                        if (eventRemoved) {
+                            return;
                         }
                     }
+                } catch (error) {
+                    console.error('Erro ao deletar evento:', error);
                 }
             });
 
@@ -423,17 +481,6 @@ export class Calendar {
         }
     };
 
-    //lets store events in local
-    saveEvents() {
-        localStorage.setItem("events", JSON.stringify(this.eventsArr));
-    };
-
-    getEvents() {
-        if (localStorage.getItem("events" === null)) {
-            return;
-        }
-        this.eventsArr.push(...JSON.parse(localStorage.getItem("events")))
-    }
 
     annotationBnt() {
         if (this.addReminder.classList.contains("active")) {

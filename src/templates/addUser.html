@@ -21,29 +21,34 @@
     <link rel="stylesheet" href="main.css" />
   </head>
   <body>
-    <div class="container-user" id="login">
-      <section class="section-initial">
-        <i class="fa-regular fa-calendar"></i>
-        <h2 class="section-initial_title">Sua Agenda</h2>
-        <span class="section-initial_span">Faça login e comece a usar!</span>
-      </section>
-      <section class="section-login">
-        <form class="form-login">
-          <label class="form-login_label" for="email"
+    <div class="container-user" id="register">
+        <section class="section-initial">
+            <i class="fa-regular fa-calendar" style="color: #b38add;"></i>
+            <h2 class="section-initial_title">Sua Agenda</h2>
+            <span class="section-initial_span">Faça login e comece a usar!</span>
+          </section>
+          <section class="section-login">
+            <form class="form-login">
+            <label class="form-login_label" for="name_register"
+            ><i class="fa fa-user"></i><input  class="form-login_input name_register"
+              id="name_register"
+              type="text"
+              placeholder="Nome"
+          /></label>
+          <label class="form-login_label" for="email_register"
             ><i class="fa fa-envelope"></i><input
-            class="form-login_input email_login"
-              id="email"
+            class="form-login_input email_register"
+              id="email_register"
               type="text"
               placeholder="Email"
           /></label>
           <label class="form-login_label" for="password"
             ><i class="fa fa-lock"></i>
-            <input class="form-login_input password_login" id="password" type="password" placeholder="Senha"
+            <input class="form-login_input password_register" id="password_register" type="password" placeholder="Senha"
           /></label>
         </form>
-        
-        <button  class="button-login" type="submit">Acessar</button>
-       <a class="link-login" href="addUser.html">Não possui conta? Crie um agora!</a>
+        <button class="button_register" type="submit">Criar usuário</button> 
+        <a class="link-login" href="index.html">Voltar</a>
       </section>
     </section>
   </div>

@@ -22,6 +22,8 @@
     "vinyl-buffer": "^1.0.1"
   },
   "dependencies": {
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.0",
     "vinyl-source-stream": "^2.0.0"
   }
 }

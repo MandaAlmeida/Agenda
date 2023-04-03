@@ -140,6 +140,7 @@
         background-color: $white;
         transform: translateX(-50%);
         transition: max-height 0.5s;
+        z-index: 100;
 
         &.active {
             max-height: 300px;
