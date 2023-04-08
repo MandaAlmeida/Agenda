@@ -1,6 +1,7 @@
 export class Calendar {
     constructor() {
-        this.eventsArr = []
+        this.eventsArr = [];
+        this.annotationArr = [];
         this.today = new Date();
         this.activeDay;
         this.month = this.today.getMonth();
@@ -22,7 +23,6 @@ export class Calendar {
         ];
         if (localStorage.getItem('token')) {
             this.init();
-
         } else {
             window.location.href = 'http://localhost:3000/index.html';
         }
@@ -31,6 +31,8 @@ export class Calendar {
     async init() {
         this.selectors();
         await this.createEvents();
+        await this.createAnnotation();
+        this.renderPage();
         this.events();
         this.initCalendar();
         this.user();
@@ -61,9 +63,19 @@ export class Calendar {
         this.error = document.querySelector(".alert");
         this.addAnnotation = document.querySelector(".annotation-container");
         this.addReminder = document.querySelector(".reminder-container");
-        this.reminderBntEvent = document.querySelector(".reminder-bnt");
-        this.annotationBntEvent = document.querySelector(".annotation-bnt");
-
+        this.inputTitle = document.querySelector(".form-title");
+        this.inputDescription = document.querySelector(".form-description");
+        this.createAnnotationBnt = document.querySelector(".create-annotations-bnt");
+        this.reminderBnt = document.querySelector(".reminder-bnt");
+        this.annotationBnt = document.querySelector(".annotation-bnt");
+        this.items = document.querySelector(".annotations");
+        this.addAnnotationBtn = document.querySelector(".add-annotation-bnt");
+        this.addAnnotationContainer = document.querySelector(".create-annotations");
+        this.addAnnotationCloseBtn = document.querySelector(".close-annotation");
+        this.pictureInput = document.querySelector('#picture_input');
+        this.pictureImage = document.querySelector('.picture_image');
+        this.pictureImageTxt = 'Imagem';
+        this.pictureImage.innerHTML = this.pictureImageTxt;
     }
 
     events() {
@@ -76,9 +88,8 @@ export class Calendar {
         this.addEventFrom.addEventListener("input", this.addEventFromF.bind(this));
         this.addEventTo.addEventListener("input", this.addEventToF.bind(this));
         this.addEventSubmit.addEventListener("click", this.addEventSubmitF.bind(this));
-        this.eventsContainer.addEventListener("click", this.eventsContainerF.bind(this));
-        this.annotationBntEvent.addEventListener("click", this.annotationBnt.bind(this));
-        this.reminderBntEvent.addEventListener("click", this.reminderBnt.bind(this));
+        this.annotationBnt.addEventListener("click", this.annotationEventBnt.bind(this));
+        this.reminderBnt.addEventListener("click", this.annotationReminderBnt.bind(this));
         this.addEventBtn.addEventListener("click", () => {
             this.addEventContainer.classList.toggle("active");
         });
@@ -92,7 +103,21 @@ export class Calendar {
         });
         this.userBnt.addEventListener("click", () => {
             this.containerUser.classList.toggle("active");
-        })
+        });
+        this.addAnnotationBtn.addEventListener("click", () => {
+            this.addAnnotationContainer.classList.toggle("active");
+        });
+        this.addAnnotationCloseBtn.addEventListener("click", () => {
+            this.addAnnotationContainer.classList.remove("active")
+        });
+
+        document.addEventListener("click", (e) => {
+            if (e.target == !this.addAnnotationBtn && !this.addAnnotationContainer.contains(e.target)) {
+                this.addAnnotationContainer.classList.remove("active");
+            }
+        });
+        this.createAnnotationBnt.addEventListener("click", this.createAnnotationBntF.bind(this));
+        this.pictureInput.addEventListener('change', this.addPreviewImage.bind(this));
     }
 
     user() {
@@ -130,6 +155,7 @@ export class Calendar {
 
         for (let x = 1; x <= lastDate; x++) {
             let event = false;
+            let annotation = false;
             this.eventsArr.forEach((eventObj) => {
                 const date = eventObj.date;
                 const dia = date.substr(0, 2);
@@ -142,6 +168,18 @@ export class Calendar {
                     event = true
                 }
             })
+            this.annotationArr.forEach((annotationObj) => {
+                const date = annotationObj.date;
+                const dia = date.substr(0, 2);
+                const mes = date.substr(2, 2);
+                const ano = date.substr(4, 4);
+                if (
+                    dia == x && mes == this.month + 1 && ano == this.year
+                ) {
+                    // if event found
+                    annotation = true
+                }
+            })
             //if day is today add class today
             if (x == new Date().getDate() && this.year == new Date().getFullYear() && this.month == new Date().getMonth()) {
 
@@ -150,15 +188,24 @@ export class Calendar {
                 this.updateEvents(x);
                 //if event found also add event class
                 //add active on today at startup
-                if (event) {
-                    days += `<div class="day today active event" >${x}</div>`;
+                if (event && annotation) {
+                    days += `<div class="day today active event-active annotation-active" >${x}</div>`;
+                } else if (event) {
+                    days += `<div class="day today active event-active" >${x}</div>`;
+                } else if (annotation) {
+                    days += `<div class="day today active annotation-active" >${x}</div>`;
                 } else {
                     days += `<div class="day today active" >${x}</div>`;
                 }
             }
             else {
-                if (event) {
-                    days += `<div class="day event" >${x}</div>`;
+                if (event && annotation) {
+                    days += `<div class="day event-active annotation-active" >${x}</div>`;
+                }
+                else if (annotation) {
+                    days += `<div class="day annotation-active" >${x}</div>`;
+                } else if (event) {
+                    days += `<div class="day event-active" >${x}</div>`;
                 } else {
                     days += `<div class="day " >${x}</div>`;
                 }
@@ -173,6 +220,7 @@ export class Calendar {
 
         this.addListener();
         this.updateEvents(this.activeDay);
+        this.removeEvent();
     }
 
     prevMonth() {
@@ -317,6 +365,8 @@ export class Calendar {
         this.eventDay.innerHTML = dayName;
         this.eventDate.innerHTML = `${date} de ${this.months[this.month]} de ${this.year}`;
         this.updateEvents(date);
+        this.renderListItems(date);
+        this.renderItem();
     }
 
     async createEvents() {
@@ -328,7 +378,6 @@ export class Calendar {
 
     //function to show events of that day
     updateEvents(date) {
-
         let events = ""
         this.eventsArr.forEach((event) => {
             const dateEvent = event.date;
@@ -336,18 +385,19 @@ export class Calendar {
             const mes = dateEvent.substr(2, 2);
             const ano = dateEvent.substr(4, 4);
             const dateUpdate = date.toString().padStart(2, '0');
-
             //get events of active day only
             if (dateUpdate == dia && this.month + 1 == mes && this.year == ano) {
                 // then show event on document 
                 events += `
-                <div class="event">
-                <div class="title">
+                <div id=${event.id} class="event">
+                <i class="fas fa-check close-event"></i>
+                <div class="container-text"> <div class="title">
                 <i class="fas fa-circle"></i>
                 <h3 class="event-title">${event.title}</h3></div>
                 <div class="event-time">
                 <span>${event.hourStart} - ${event.hourEnd}</span>
-                </div>
+                </div></div>
+               
                 </div>`;
 
             }
@@ -360,6 +410,7 @@ export class Calendar {
 
 
         this.eventsContainer.innerHTML = events;
+        this.removeEvent();
     }
 
     //lets create function to add events
@@ -368,6 +419,7 @@ export class Calendar {
         const eventTitle = this.addEventTitle.value;
         const eventTimeFrom = this.addEventFrom.value;
         const eventTimeTo = this.addEventTo.value;
+        const date = this.activeDay.toString().padStart(2, '0').concat((this.month + 1).toString().padStart(2, '0'), this.year.toString());
         const user = JSON.parse(localStorage.getItem('user'));
 
         //some validations
@@ -385,14 +437,39 @@ export class Calendar {
             return;
         }
 
-
-        const date = this.activeDay.toString().padStart(2, '0').concat((this.month + 1).toString().padStart(2, '0'), this.year.toString());
+        let eventExist = false;
+        this.eventsArr.forEach((event) => {
+            if (
+                event.date === date
+            )
+                if (event.title === eventTitle) {
+                    eventExist = true;
+                }
+        });
+        if (eventExist) {
+            alert("Evento já existe");
+            return;
+        }
 
         const newEvent = {
             title: eventTitle,
             hourStart: eventTimeFrom,
             hourEnd: eventTimeTo,
             date: date,
+        }
+
+        let eventAdded = false;
+        if (this.eventsArr.length > 0) {
+            if (
+                this.eventsArr.date == date
+            ) {
+                item.push({ date: date, events: newEvent });
+                eventAdded = true;
+            }
+        };
+
+        if (!eventAdded) {
+            this.eventsArr.push(newEvent);
         }
 
         const id = user[0].id
@@ -406,94 +483,332 @@ export class Calendar {
         })
             .then(response => response.json())
             .then(data => {
-                console.log('data:', data)
+                this.addEventTitle.value = "";
+                this.addEventFrom.value = "";
+                this.addEventTo.value = "";
+                this.addEventContainer.classList.remove("active")
+                console.log("data:", data)
             })
             .catch(error => {
-                console.error('Erro ao criar data', error);
+                console.error('Erro ao criar lembrete', error);
             });
-        //rename active from add event form
-        this.addEventContainer.classList.remove("active")
-
-        //clear the fields
-        this.addEventTitle.value = "";
-        this.addEventFrom.value = "";
-        this.addEventTo.value = "";
 
         //also add event class to newly added day if not already
-        if (!activeDayElem.classList.contains("event")) {
-            activeDayElem.classList.add("event")
+        if (!activeDayElem.classList.contains("event-active")) {
+            activeDayElem.classList.add("event-active")
         }
-        this.createEvents();
+
         this.updateEvents(this.activeDay);
     };
-    //lets create a function to remove events on click
 
-    eventsContainerF(e) {
-        const activeDayElem = document.querySelector(".day.active");
-        if (e.target.classList.contains("event")) {
-            const eventTitle = e.target.children[0].children[1].innerHTML;
+    removeEvent() {
+        if (this.addReminder.classList.contains('active')) {
+            const event = document.querySelectorAll('.event');
+            const activeDayElem = document.querySelector(".day.active.event-active");
+            const events = this.eventsArr;
+            const id = this.users[0].id;
 
-            this.eventsArr.forEach(async (event) => {
-                const id = event.id;
-                const dateEvent = event.date;
-                const dia = dateEvent.substr(0, 2);
-                const mes = dateEvent.substr(2, 2);
-                const ano = dateEvent.substr(4, 4);
-
-                try {
-                    const response = await fetch(`https://server-agenda.vercel.app/reminder/${id}`, {
+            event.forEach((item) => {
+                const deleteEvent = item.querySelector(".close-event");
+                deleteEvent.addEventListener("click", function () {
+                    const text = item.querySelector(".container-text")
+                    const titulo = text.querySelector(".title .event-title").textContent;
+                    fetch(`https://server-agenda.vercel.app/user/${id}/reminder/${encodeURIComponent(titulo)}`, {
                         method: 'DELETE',
                         headers: {
                             'Content-Type': 'application/json'
-                        }
-                    });
-                    const data = await response.json();
-                    if (dia === this.activeDay && mes === this.month + 1 && ano === this.year) {
-                        console.log("foi")
-                        let eventRemoved = false;
-                        event.events.forEach((item, index) => {
-                            if (item.title === eventTitle) {
-                                event.events.splice(index, 1);
-                                eventRemoved = true;
+                        },
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Erro ao excluir item do servidor');
                             }
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log("data:", data);
+                            events = events.filter(event => event.titulo !== titulo);
+
+                            if (events.length === 0) {
+                                activeDayElem.classList.remove("event-active");
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Erro ao excluir item', error);
                         });
-
-                        //if no event remaining on that dat remove complete day
-                        if (event.events.length === 0) {
-                            this.eventsArr.splice(this.eventsArr.indexOf(event), 1);
-
-                            //after remove complete day also remove active class of that day
-                            if (activeDayElem.classList.contains("event")) {
-                                activeDayElem.classList.remove("event")
-                            }
-                        }
-
-                        if (eventRemoved) {
-                            return;
-                        }
-                    }
-                } catch (error) {
-                    console.error('Erro ao deletar evento:', error);
-                }
+                });
             });
 
-            this.updateEvents(this.activeDay);
+        }
+
+    }
+
+    async createAnnotation() {
+        const id = this.users[0].id
+        const response = await fetch(`https://server-agenda.vercel.app/user/${id}/notes`);
+        const data = await response.json();
+        this.annotationArr = data;
+    }
+
+    addPreviewImage(e) {
+        const inputTarget = e.target;
+        const file = inputTarget.files[0];
+
+        if (file) {
+            const reader = new FileReader();
+
+            reader.addEventListener('load', (e) => {
+                const readerTarget = e.target;
+                const img = document.createElement('img');
+                img.src = readerTarget.result;
+                img.classList.add('picture-img');
+                this.pictureImage.innerHTML = "";
+                this.pictureImage.appendChild(img);
+
+            })
+
+            reader.readAsDataURL(file);
+
+        } else {
+            this.pictureImage.innerHTML = this.pictureImageTxt;
+
         }
     };
 
+    createAnnotationBntF() {
+        const itemTitle = this.inputTitle.value;
+        const itemDescription = this.inputDescription.value;
+        const itemPicture = this.pictureImage.children[0].src;
+        const date = this.activeDay.toString().padStart(2, '0').concat((this.month + 1).toString().padStart(2, '0'), this.year.toString());
+        const id = this.users[0].id;
+        const activeDayElem = document.querySelector(".day.active");
 
-    annotationBnt() {
-        if (this.addReminder.classList.contains("active")) {
-            this.addReminder.classList.remove("active");
-            this.addAnnotation.classList.add("active");
+        if (itemTitle === "" || itemDescription === "") {
+            alert(" Por favor, preencha todos os campos");
+            return;
+        }
+
+        let annotationExist = false;
+        this.annotationArr.forEach((event) => {
+            if (
+                event.date === date
+            )
+                if (event.title === itemTitle && event.text === itemDescription) {
+                    annotationExist = true;
+                }
+        });
+        if (annotationExist) {
+            alert("Nota já existe");
+            return;
+        }
+
+        let picture = "";
+        if (itemPicture != "") {
+            picture = itemPicture;
+        } else {
+            picture = "./img/imgWhite.jpeg"
+        }
+
+        const item = {
+            title: itemTitle,
+            text: itemDescription,
+            img: picture,
+            date: date
+        };
+        this.annotationArr.push(item);
+
+        fetch(`https://server-agenda.vercel.app/user/${id}/notes`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(item),
+        })
+            .then(response => response.json())
+            .then(data => {
+                this.inputTitle.value = "";
+                this.inputDescription.value = "";
+                this.addAnnotationContainer.classList.remove("active")
+                console.log("data:", data)
+            })
+            .catch(error => {
+                console.error('Erro ao criar anotação', error);
+            });
+
+        if (!activeDayElem.classList.contains("annotation-active")) {
+            activeDayElem.classList.add("annotation-active")
+        }
+
+        this.renderListItems(this.activeDay);
+    };
+
+    renderListItems(date) {
+        let annotations = "";
+
+        this.annotationArr.forEach((annotation) => {
+            const dateAnnotation = annotation.date;
+            const dia = dateAnnotation.substr(0, 2);
+            const mes = dateAnnotation.substr(2, 2);
+            const ano = dateAnnotation.substr(4, 4);
+            const dateUpdate = date.toString().padStart(2, '0');
+            //get events of active day only
+            if (dateUpdate == dia && this.month + 1 == mes && this.year == ano) {
+
+                annotations += `
+                <li id=${annotation.id} class="annotation">
+                <ul class="list-annotations">
+            <li id=${annotation.id} class="annotation-prev">
+            <i class="fas fa-times close-annotation"></i>
+            <div class="annotation-prev_text"><h3  class="annotation-prev-title">${annotation.title}</h3>
+                    <p class="annotation-prev-description">${annotation.text}</p></div>
+                    
+            </li>
+            <li id=${annotation.id} class="annotation-img">
+                    <i class="fas fa-times close-annotation-img"></i>
+                    <figure class="annotation-img_figure">
+                    <img class="image-result" src=${annotation.img} />
+                    <figcaption class="annotation-img-title">${annotation.title}
+                    </figcaption>
+                    </figure>
+                    <p class="annotation-img-description">${annotation.text}</p>
+                </li></ul></li>
+        `;
+            }
+        })
+        if (annotations === "") {
+            annotations = `<div class="no-note">
+                <h3>Nenhuma Nota</h3>
+            </div>`;
+        }
+        this.items.innerHTML = annotations;
+        this.removeAnnotation();
+        this.renderItem();
+    };
+
+    removeAnnotation() {
+        if (this.addAnnotation.classList.contains('active')) {
+            const firstLis = document.querySelectorAll('.annotation-prev');
+            const activeDayElem = document.querySelector(".day.active.annotation-active");
+            const annotations = this.annotationArr;
+            const id = this.users[0].id;
+
+
+            firstLis.forEach((item) => {
+                const delet = item.querySelector(".close-annotation")
+                delet.addEventListener("click", function () {
+                    const text = item.querySelector(".annotation-prev_text .annotation-prev-description").textContent
+                    const titulo = item.querySelector(".annotation-prev_text .annotation-prev-title").textContent;
+                    fetch(`https://server-agenda.vercel.app/user/${id}/notes/${encodeURIComponent(titulo)}/${encodeURIComponent(text)}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log("data:", data)
+                        })
+                        .catch(error => {
+                            console.error('Erro ao excluir anotação', error);
+                        });
+
+
+                    for (let i = 0; i < annotations.length; i++) {
+                        if (annotations[i].id === id) {
+                            annotations.splice(i, 1);
+                            break;
+                        }
+                    }
+                    if (annotations.length === 0) {
+                        activeDayElem.classList.remove("annotation-active")
+                    }
+                });
+            });
+        }
+
+    }
+
+    renderItem() {
+        if (this.addAnnotation.classList.contains('active')) {
+            const firstLis = document.querySelectorAll('.annotation-prev');
+            const secondLis = document.querySelectorAll('.annotation-img');
+
+            firstLis.forEach((item) => {
+                const text = item.querySelector(".annotation-prev_text");
+                text.addEventListener("click", function () {
+                    const id_clicado = item.getAttribute("id");
+
+                    secondLis.forEach((annotationImg) => {
+                        const annotationImgId = annotationImg.getAttribute("id");
+                        if (annotationImgId === id_clicado) {
+                            annotationImg.classList.add("active");
+                            console.log(id_clicado)
+                        } else {
+                            annotationImg.classList.remove("active");
+                        }
+                    });
+
+                    const annotationImg = item.nextElementSibling;
+                    if (annotationImg && annotationImg.classList.contains("active")) {
+                        const button = annotationImg.querySelector(".close-annotation-img")
+                        button.addEventListener("click", () => {
+                            annotationImg.classList.remove("active");
+                        })
+                    }
+                });
+            });
         }
     }
 
-    reminderBnt() {
-        if (this.addAnnotation.classList.contains("active")) {
+    renderPage() {
+        // Recuperar o valor do estado do item do localStorage
+        let ativo = JSON.parse(localStorage.getItem('ativo'));
+
+        if (ativo) {
+            this.addReminder.classList.remove("active");
+            this.addAnnotation.classList.add("active");
+        } else {
             this.addAnnotation.classList.remove("active");
             this.addReminder.classList.add("active");
         }
+    }
+
+    annotationEventBnt() {
+        // Recuperar o valor do estado do item do localStorage
+        let ativo = JSON.parse(localStorage.getItem('ativo'));
+
+        if (this.addReminder.classList.contains("active")) {
+            this.addReminder.classList.remove("active");
+            this.addAnnotation.classList.add("active");
+            ativo = true; // Atualizar o valor do estado do item
+        } else {
+            ativo = false; // Atualizar o valor do estado do item
+        }
+
+        // Armazenar o novo valor do estado do item no localStorage
+        localStorage.setItem('ativo', JSON.stringify(ativo));
+
+        this.renderListItems(this.activeDay);
+        this.renderItem();
+        this.removeAnnotation();
+    }
+
+    annotationReminderBnt() {
+        // Recuperar o valor do estado do item do localStorage
+        let ativo = JSON.parse(localStorage.getItem('ativo'));
+
+        if (this.addAnnotation.classList.contains("active")) {
+            this.addAnnotation.classList.remove("active");
+            this.addReminder.classList.add("active");
+            ativo = false; // Atualizar o valor do estado do item
+        } else {
+            ativo = true; // Atualizar o valor do estado do item
+        }
+
+        // Armazenar o novo valor do estado do item no localStorage
+        localStorage.setItem('ativo', JSON.stringify(ativo));
+
+        this.removeEvent();
     }
 
 }

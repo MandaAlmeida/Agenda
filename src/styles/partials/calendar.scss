@@ -48,6 +48,11 @@
         }
     }
 
+    .weekdays-days {
+        width: 100%;
+        height: 70%;
+    }
+
     .weekdays {
         width: 100%;
         height: 12%;
@@ -70,7 +75,7 @@
 
     .days {
         width: 100%;
-        height: 50%;
+        height: 75%;
         display: flex;
         flex-wrap: wrap;
         justify-content: space-between;
@@ -105,20 +110,9 @@
             font-size: 2rem;
             color: $white;
             background-color: $primary;
-
-            &::before {
-                content: "";
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                box-shadow: 0 0 10px 2px $primary;
-            }
-
         }
 
-        .active.event {
+        .active.event-active {
             padding-bottom: 10px;
 
             &::after {
@@ -127,11 +121,20 @@
             }
         }
 
+        .active.annotation-active {
+            padding-bottom: 10px;
+
+            &::before {
+                background-color: $gray5;
+                bottom: 10%;
+            }
+        }
+
         .today {
             font-size: 2rem;
         }
 
-        .event {
+        .event-active {
             position: relative;
 
             &::after {
@@ -140,7 +143,7 @@
                 bottom: 10%;
                 left: 50%;
                 width: 75%;
-                height: 6px;
+                height: 3px;
                 border-radius: 30px;
                 transform: translateX(-50%);
                 background-color: $primary;
@@ -150,6 +153,28 @@
 
             &:hover::after {
                 background-color: $white;
+            }
+        }
+
+        .annotation-active {
+            position: relative;
+
+            &::before {
+                content: "";
+                position: absolute;
+                bottom: 3%;
+                left: 50%;
+                width: 75%;
+                height: 3px;
+                border-radius: 30px;
+                transform: translateX(-50%);
+                background-color: $primary1;
+
+
+            }
+
+            &:hover::before {
+                background-color: $gray5;
             }
         }
     }
@@ -162,7 +187,7 @@
         justify-content: space-between;
         gap: 5px;
         padding: 0 20px;
-        margin-bottom: 20px;
+        margin-bottom: 10px;
         color: $primary;
 
         .go {
@@ -208,7 +233,7 @@
 @media (max-width: 1024px) {
     .left {
         width: 100%;
-        height: 100%;
+        height: 100vh;
         padding: 20px 0;
 
         .calendar {
@@ -228,6 +253,8 @@
 
 @media screen and (max-width: 500px) {
     .left {
+        height: 100%;
+
         .calendar {
             .month {
                 height: 75px;

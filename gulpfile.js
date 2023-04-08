@@ -1,5 +1,6 @@
 const { src, dest, watch, parallel } = require('gulp');
 const sass = require('gulp-sass')(require('sass'));
+const htmlmin = require('gulp-htmlmin');
 const browserify = require('browserify');
 const babelify = require('babelify');
 const source = require('vinyl-source-stream');
@@ -9,7 +10,11 @@ const connect = require('gulp-connect');
 
 const paths = {
     html: {
-        all: "src/templates/**/*.html"
+        all: "src/templates/**/*.html",
+        index: "src/templates/index.html"
+    },
+    image: {
+        all: "src/asset/**"
     },
     styles: {
         all: "src/styles/**/*.scss",
@@ -20,7 +25,7 @@ const paths = {
         app: "src/scripts/app.js"
     },
 
-    output: '../Agenda-dist/dist'
+    output: './dist'
 
 }
 
@@ -35,12 +40,13 @@ function server() {
 
 function sentinel() {
     watch(paths.html.all, { ignoreInitial: false }, html);
+    watch(paths.image.all, { ignoreInitial: false }, image)
     watch(paths.styles.all, { ignoreInitial: false }, styles);
     watch(paths.scripts.all, { ignoreInitial: false }, scripts);
 }
 
 function html() {
-    return src(paths.html.all).pipe(dest(paths.output)).pipe(connect.reload());
+    return src(paths.html.all).pipe(htmlmin({ collapseWhitespace: true })).pipe(dest(paths.output)).pipe(connect.reload());
 }
 
 function image() {

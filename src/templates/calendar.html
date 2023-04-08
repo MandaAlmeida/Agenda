@@ -29,16 +29,18 @@
             <div class="date"></div>
             <i class="fa fa-angle-right next"></i>
           </div>
-          <div class="weekdays">
-            <div>dom</div>
-            <div>seg</div>
-            <div>ter</div>
-            <div>qua</div>
-            <div>qui</div>
-            <div>sex</div>
-            <div>sab</div>
-          </div>
-          <div class="days"></div>
+          <section class="weekdays-days">
+            <div class="weekdays">
+              <div>dom</div>
+              <div>seg</div>
+              <div>ter</div>
+              <div>qua</div>
+              <div>qui</div>
+              <div>sex</div>
+              <div>sab</div>
+            </div>
+            <div class="days"></div>
+          </section>
           <div class="go-today">
             <div class="go">
               <input type="text" class="date-input" placeholder="mm/yyyy" />
@@ -72,8 +74,29 @@
               <i class="fas fa-times close-annotation"></i>
             </div>
             <div class="form-wrapper">
+              <section class="img-text">
+                <label class="picture" tabindex="0">
+                  <input
+                    type="file"
+                    accept="image/png, image/jpg"
+                    id="picture_input"
+                    name="picture_input"
+                    class="picture_input"
+                    placeholder="Imagem"
+                  />
+                  <span
+                    data-test="input-image"
+                    class="picture_image"
+                  ></span> </label
+                ><textarea
+                  cols="30"
+                  rows="5"
+                  placeholder="Título"
+                  class="form-title"
+                  required
+                ></textarea>
+              </section>
               <label class="text">
-                <input type="text" placeholder="Título" class="form-title" />
                 <textarea
                   cols="30"
                   rows="5"
