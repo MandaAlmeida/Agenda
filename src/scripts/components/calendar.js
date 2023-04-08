@@ -258,7 +258,7 @@ export class Calendar {
     };
 
     addEventTitleF(e) {
-        this.addEventTitle.value = this.addEventTitle.value.slice(0, 50)
+        this.addEventTitle.value = this.addEventTitle.value.slice(0, 50).replace(/\d+/g, "")
     };
 
     addEventFromF(e) {
@@ -387,9 +387,10 @@ export class Calendar {
             const dateUpdate = date.toString().padStart(2, '0');
             //get events of active day only
             if (dateUpdate == dia && this.month + 1 == mes && this.year == ano) {
+                const title = event.title.replace(/[!@#$%^&*()_+\-={}\[\]|\\;:'"<>,.?/]/g, "").replace(/\s+/g, '')
                 // then show event on document 
                 events += `
-                <div id=${event.id} class="event">
+                <div class="event active ${title}">
                 <i class="fas fa-check close-event"></i>
                 <div class="container-text"> <div class="title">
                 <i class="fas fa-circle"></i>
@@ -410,7 +411,7 @@ export class Calendar {
 
 
         this.eventsContainer.innerHTML = events;
-        this.removeEvent();
+        this.removeEvent()
     }
 
     //lets create function to add events
@@ -504,8 +505,9 @@ export class Calendar {
     removeEvent() {
         if (this.addReminder.classList.contains('active')) {
             const event = document.querySelectorAll('.event');
-            const activeDayElem = document.querySelector(".day.active.event-active");
+            const activeDayElem = document.querySelector(".day.active");
             const events = this.eventsArr;
+            const containerEvents = this.eventsContainer;
             const id = this.users[0].id;
 
             event.forEach((item) => {
@@ -527,8 +529,14 @@ export class Calendar {
                         })
                         .then(data => {
                             console.log("data:", data);
-                            events = events.filter(event => event.titulo !== titulo);
+                            let index = events.findIndex(item => item.title === titulo);
 
+
+                            if (index !== -1) {
+                                events.splice(index, 1);
+                                console.log("Item removido do array com sucesso!");
+
+                            }
                             if (events.length === 0) {
                                 activeDayElem.classList.remove("event-active");
                             }
@@ -536,11 +544,27 @@ export class Calendar {
                         .catch(error => {
                             console.error('Erro ao excluir item', error);
                         });
+
+                    const title = titulo.replace(/[!@#$%^&*()_+\-={}\[\]|\\;:'"<>,.?/]/g, "").replace(/\s+/g, '')
+                    const itemRemove = document.querySelector(`.event.active.${title}`)
+                    if (itemRemove) {
+                        itemRemove.classList.remove("active")
+
+                        if (events.length == 1) {
+                            console.log(item);
+                            containerEvents.innerHTML = `<div class="no-event">
+                                                            <h3>Nenhum Evento</h3>
+                                                          </div>`;
+                            if (activeDayElem.classList.contains("event-active")) {
+                                activeDayElem.classList.remove("event-active")
+                            }
+                        }
+                    }
                 });
             });
 
-        }
 
+        }
     }
 
     async createAnnotation() {
@@ -628,6 +652,7 @@ export class Calendar {
             .then(data => {
                 this.inputTitle.value = "";
                 this.inputDescription.value = "";
+                this.pictureImage.innerHTML = "";
                 this.addAnnotationContainer.classList.remove("active")
                 console.log("data:", data)
             })
@@ -653,9 +678,11 @@ export class Calendar {
             const dateUpdate = date.toString().padStart(2, '0');
             //get events of active day only
             if (dateUpdate == dia && this.month + 1 == mes && this.year == ano) {
+                const title = annotation.title.replace(/[!@#$%^&*()_+\-={}\[\]|\\;:'"<>,.?/]/g, "").replace(/\s+/g, '').replace(/\d+/g, "")
+                const text = annotation.text.replace(/[!@#$%^&*()_+\-={}\[\]|\\;:'"<>,.?/]/g, "").replace(/\s+/g, '').slice(0, 30).replace(/\d+/g, "")
 
                 annotations += `
-                <li id=${annotation.id} class="annotation">
+                <li class="annotation active ${title} ${text} ">
                 <ul class="list-annotations">
             <li id=${annotation.id} class="annotation-prev">
             <i class="fas fa-times close-annotation"></i>
@@ -688,8 +715,9 @@ export class Calendar {
     removeAnnotation() {
         if (this.addAnnotation.classList.contains('active')) {
             const firstLis = document.querySelectorAll('.annotation-prev');
-            const activeDayElem = document.querySelector(".day.active.annotation-active");
+            const activeDayElem = document.querySelector(".day.active");
             const annotations = this.annotationArr;
+            const containerAnnotation = this.items;
             const id = this.users[0].id;
 
 
@@ -706,11 +734,37 @@ export class Calendar {
                     })
                         .then(response => response.json())
                         .then(data => {
-                            console.log("data:", data)
+                            console.log("data:", data);
+                            let index = annotations.findIndex(item => item.title === titulo, item.text === text);
+                            if (index !== -1) {
+                                annotations.splice(index, 1);
+                                console.log("Item removido do array com sucesso!");
+
+                            }
                         })
                         .catch(error => {
                             console.error('Erro ao excluir anotação', error);
                         });
+
+                    const titleRemove = titulo.replace(/[!@#$%^&*()_+\-={}\[\]|\\;:'"<>,.?/]/g, "").replace(/\s+/g, '').replace(/\d+/g, "")
+                    const textRemove = text.replace(/[!@#$%^&*()_+\-={}\[\]|\\;:'"<>,.?/]/g, "").replace(/\s+/g, '').slice(0, 30).replace(/\d+/g, "")
+
+                    const itemRemove = document.querySelector(`.annotation.active.${titleRemove}.${textRemove}`)
+
+                    console.log(itemRemove)
+                    if (itemRemove) {
+                        itemRemove.classList.remove("active")
+
+                        if (annotations.length == 1) {
+                            console.log(item);
+                            containerAnnotation.innerHTML = `<div class="no-note">
+                            <h3>Nenhuma Nota</h3>
+                        </div>`;
+                            if (activeDayElem.classList.contains("annotation-active")) {
+                                activeDayElem.classList.remove("annotation-active")
+                            }
+                        }
+                    }
 
 
                     for (let i = 0; i < annotations.length; i++) {

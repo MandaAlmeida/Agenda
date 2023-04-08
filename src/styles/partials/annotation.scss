@@ -40,9 +40,17 @@
             }
 
             .annotation {
+                display: none;
                 list-style: none;
                 min-width: 150px;
 
+                &.active {
+                    display: flex;
+                }
+
+                .list-annotations {
+                    width: 100%;
+                }
 
                 .annotation-prev {
                     border-radius: 5px;
@@ -88,7 +96,7 @@
                     left: 50%;
                     transform: translateX(-50%);
                     list-style: none;
-                    width: 70%;
+                    width: 80%;
                     height: 100%;
                     background-color: $primary1;
                     display: none;
