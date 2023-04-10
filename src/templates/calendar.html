@@ -76,18 +76,13 @@
             <div class="form-wrapper">
               <section class="img-text">
                 <label class="picture" tabindex="0">
-                  <input
-                    type="file"
-                    accept="image/png, image/jpg"
-                    id="picture_input"
-                    name="picture_input"
-                    class="picture_input"
-                    placeholder="Imagem"
-                  />
-                  <span
-                    data-test="input-image"
-                    class="picture_image"
-                  ></span> </label
+                  <input id="img-input" type="file" name="imagem" />
+                  <div class="img-container">
+                    <img
+                      alt="preview de imagem"
+                      id="preview"
+                      src="./img/imgWhite.jpeg"
+                    /></div></label
                 ><textarea
                   cols="30"
                   rows="5"

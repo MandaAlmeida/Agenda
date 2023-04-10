@@ -25,7 +25,7 @@ const paths = {
         app: "src/scripts/app.js"
     },
 
-    output: '../Agenda-dist/dist'
+    output: './dist'
 
 }
 

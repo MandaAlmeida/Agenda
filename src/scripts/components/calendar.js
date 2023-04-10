@@ -72,10 +72,8 @@ export class Calendar {
         this.addAnnotationBtn = document.querySelector(".add-annotation-bnt");
         this.addAnnotationContainer = document.querySelector(".create-annotations");
         this.addAnnotationCloseBtn = document.querySelector(".close-annotation");
-        this.pictureInput = document.querySelector('#picture_input');
-        this.pictureImage = document.querySelector('.picture_image');
-        this.pictureImageTxt = 'Imagem';
-        this.pictureImage.innerHTML = this.pictureImageTxt;
+        this.pictureInput = document.querySelector('#img-input');
+        this.pictureImage = document.querySelector('#preview');
     }
 
     events() {
@@ -577,32 +575,28 @@ export class Calendar {
     addPreviewImage(e) {
         const inputTarget = e.target;
         const file = inputTarget.files[0];
+        const img = document.querySelector('#preview');
 
         if (file) {
             const reader = new FileReader();
 
             reader.addEventListener('load', (e) => {
                 const readerTarget = e.target;
-                const img = document.createElement('img');
-                img.src = readerTarget.result;
-                img.classList.add('picture-img');
+                img.src = readerTarget.result; // Atualiza o src com o resultado da leitura do arquivo
                 this.pictureImage.innerHTML = "";
                 this.pictureImage.appendChild(img);
-
-            })
+            });
 
             reader.readAsDataURL(file);
-
         } else {
-            this.pictureImage.innerHTML = this.pictureImageTxt;
-
+            this.pictureImage.innerHTML = "";
         }
-    };
+    }
 
     createAnnotationBntF() {
         const itemTitle = this.inputTitle.value;
         const itemDescription = this.inputDescription.value;
-        const itemPicture = this.pictureImage.children[0].src;
+        const itemPicture = this.pictureImage.src;
         const date = this.activeDay.toString().padStart(2, '0').concat((this.month + 1).toString().padStart(2, '0'), this.year.toString());
         const id = this.users[0].id;
         const activeDayElem = document.querySelector(".day.active");
@@ -625,18 +619,10 @@ export class Calendar {
             alert("Nota já existe");
             return;
         }
-
-        let picture = "";
-        if (itemPicture != "") {
-            picture = itemPicture;
-        } else {
-            picture = "./img/imgWhite.jpeg"
-        }
-
         const item = {
             title: itemTitle,
             text: itemDescription,
-            img: picture,
+            img: itemPicture,
             date: date
         };
         this.annotationArr.push(item);
@@ -652,7 +638,7 @@ export class Calendar {
             .then(data => {
                 this.inputTitle.value = "";
                 this.inputDescription.value = "";
-                this.pictureImage.innerHTML = "";
+                this.pictureImage.src = "./img/imgWhite.jpeg";
                 this.addAnnotationContainer.classList.remove("active")
                 console.log("data:", data)
             })
@@ -663,6 +649,7 @@ export class Calendar {
         if (!activeDayElem.classList.contains("annotation-active")) {
             activeDayElem.classList.add("annotation-active")
         }
+
 
         this.renderListItems(this.activeDay);
     };

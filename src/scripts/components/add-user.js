@@ -9,7 +9,9 @@ export class AddUser {
         this.addName = document.querySelector(".name_register");
         this.addEmail = document.querySelector(".email_register");
         this.addPassword = document.querySelector(".password_register");
+        this.confirmePassword = document.querySelector(".password_register-confirmation")
         this.addUserBtn = document.querySelector(".button_register");
+        this.error = document.querySelector(".error")
     }
 
     event() {
@@ -20,12 +22,19 @@ export class AddUser {
         const name = this.addName.value;
         const email = this.addEmail.value;
         const password = this.addPassword.value;
+        const confirme = this.confirmePassword.value;
 
         if (name === "" || email === "" || password === "") {
             alert(" Por favor, preencha todos os campos");
             return;
         } else {
             console.log(name, email, password);
+        }
+
+        if (password != confirme) {
+            this.error.classList.add("active")
+        } else {
+            this.error.classList.remove("active")
         }
 
         const newUser = {
