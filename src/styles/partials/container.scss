@@ -39,24 +39,12 @@
     z-index: 200;
 }
 
-.annotation-container {
-    display: none;
-
-    &.active {
-        display: flex;
-    }
-}
 
 
 .reminder-container {
-    display: none;
+    display: flex;
     flex-direction: column;
     justify-content: space-between;
-
-    &.active {
-        display: flex;
-
-    }
 }
 
 .nav-bnt {
@@ -64,7 +52,7 @@
     width: 100%;
     display: flex;
     padding: 0 20px;
-    justify-content: space-between;
+    justify-content: end;
     z-index: 10;
 
     .reminder-bnt,

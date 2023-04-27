@@ -51,63 +51,15 @@
         </div>
       </section>
       <section class="right">
-        <div class="nav-bnt">
-          <section class="nav">
-            <button class="reminder-bnt">Lembretes</button>
-            <button class="annotation-bnt">Anotações</button>
-          </section>
+        <nav class="nav-bnt">
           <section class="user">
             <button aria-label="icone-user" type="button" class="button-user">
               <i class="fa fa-user"></i>
             </button>
             <div class="container-icon-user"></div>
           </section>
-        </div>
-        <div class="annotation-container">
-          <div class="left">
-            <h3 class="title">Anotações</h3>
-            <ul class="annotations"></ul>
-          </div>
-          <div class="create-annotations">
-            <div class="create-annotations-header">
-              <h3 class="title">Criar anotação</h3>
-              <i class="fas fa-times close-annotation"></i>
-            </div>
-            <div class="form-wrapper">
-              <section class="img-text">
-                <label class="picture" tabindex="0">
-                  <input id="img-input" type="file" name="imagem" />
-                  <div class="img-container">
-                    <img
-                      alt="preview de imagem"
-                      id="preview"
-                      src="./img/imgWhite.jpeg"
-                    /></div></label
-                ><textarea
-                  cols="30"
-                  rows="5"
-                  placeholder="Título"
-                  class="form-title"
-                  required
-                ></textarea>
-              </section>
-              <label class="text">
-                <textarea
-                  cols="30"
-                  rows="5"
-                  placeholder="Descrição"
-                  class="form-description"
-                  required
-                ></textarea>
-              </label>
-            </div>
-            <button class="create-annotations-bnt">Adicionar</button>
-          </div>
-          <button class="add-annotation-bnt" aria-label="Adicionar anotações">
-            <i class="fas fa-plus"></i>
-          </button>
-        </div>
-        <div class="reminder-container active">
+        </nav>
+        <div class="reminder-container">
           <div class="today-date">
             <div class="event-day"></div>
             <div class="event-date"></div>
